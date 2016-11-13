@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:spotlight"
         mc:Ignorable="d"
-        Title="MainWindow" Height="176" Width="525">
+        Title="MainWindow" Height="303" Width="483">
     <Grid>
-        <TextBox x:Name="mainInputBox" Height="23" Margin="10,0" TextWrapping="Wrap"
-                 Text="TextBox" VerticalAlignment="Top" />
+        <TextBox x:Name="mainInputBox" Height="23" Margin="10,0" TextWrapping="Wrap" TextChanged="OnSearchInput"
+                 Text="" VerticalAlignment="Top" />
         <ListBox x:Name="listBox" Margin="10,28,10,10">
 
             <ListBox.ItemTemplate>
