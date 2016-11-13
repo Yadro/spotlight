@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using MahApps.Metro.Controls;
 
 namespace spotlight
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         private List<FileInformation> FileInformations;
 
@@ -42,6 +37,14 @@ namespace spotlight
         {
             string text = ((TextBox) sender).Text;
             listBox.ItemsSource = FileInformations.Where(file => (file.DisplayName.ToLower().StartsWith(text.ToLower())));
+        }
+
+        private void MainInputBox_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Down)
+            {
+                
+            }
         }
     }
 }
