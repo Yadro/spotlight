@@ -5,22 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:spotlight"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="176" Width="525">
     <Grid>
         <TextBox x:Name="mainInputBox" Height="23" Margin="10,0" TextWrapping="Wrap"
                  Text="TextBox" VerticalAlignment="Top" />
         <ListBox x:Name="listBox" Margin="10,28,10,10">
+
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="3">
+                    <Grid Margin="2" MouseUp="UIElement_OnMouseUp">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding icon}" Margin="0,0,10,0"/>
+                        <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding Icon}" Margin="0,0,10,0"/>
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding name}" />
-                            <TextBlock Text="{Binding name}" />
+                            <TextBlock Text="{Binding DisplayName}" />
+                            <TextBlock Text="{Binding FileLocation}" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
