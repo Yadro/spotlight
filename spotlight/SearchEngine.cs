@@ -14,7 +14,8 @@ namespace spotlight
         Music,
         Video,
         Folders,
-        Other
+        Other,
+        Archive
     }
 
     public struct SearchItemStruct
@@ -71,22 +72,28 @@ namespace spotlight
             },
             new FileTypeStruct()
             {
+                type = EFileType.Archive,
+                typeName = "Архивы",
+                regex = new Regex(@"\.(7z|zip|rar|tar)$")
+            },
+            new FileTypeStruct()
+            {
                 type = EFileType.Video,
                 typeName = "Видео",
                 regex = new Regex(@"\.(mp4|avi)$")
             },
-            /*new FileTypeStruct()
+            new FileTypeStruct()
             {
                 type = EFileType.Folders,
-                typeName = "Другое",
-                regex = new Regex(@"\.^(exe|lnk|txt|docx?|pdf|djvu|mp4|avi)$")
+                typeName = "Папки",
+                regex = new Regex(@"\\$")
             },
             new FileTypeStruct()
             {
                 type = EFileType.Other,
                 typeName = "Другое",
-                regex = new Regex(@"\.^(exe|lnk|txt|docx?|pdf|djvu|mp4|avi)$")
-            },*/
+                regex = null
+            }
         };
 
         public SearchEngine()
@@ -109,17 +116,30 @@ namespace spotlight
 
         private void GenereateData()
         {
+            List<string> fileList = new List<string>(FileList);
             foreach (FileTypeStruct fileType in FileTypes)
             {
-                // todo отсеивать найденные значения
-                IEnumerable<FileInformation> items =
-                    FileList.Where(path => fileType.regex.IsMatch(path)).Select(path => new FileInformation(path));
+                List<string> other = new List<string>();
+                List<FileInformation> items = new List<FileInformation>();
+                foreach (string path in fileList)
+                {
+                    if (fileType.regex == null)
+                        items.Add(new FileInformation(path));
+                    else
+                    {
+                        if (fileType.regex.IsMatch(path))
+                            items.Add(new FileInformation(path));
+                        else
+                            other.Add(path);
+                    }
+                }
                 Groups.Add(new GroupSearchItems()
                 {
-                    Items = new List<FileInformation>(items),
+                    Items = items,
                     Type = fileType.type,
                     TypeName = fileType.typeName
                 });
+                fileList = other;
             }
         }
 
