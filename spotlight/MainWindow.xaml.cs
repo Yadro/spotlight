@@ -42,40 +42,33 @@ namespace spotlight
 
         private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
-            Group groupG = (Group) ((TextBlock) sender).DataContext;
-            List<GroupSearchItems> resultGroups = searchEngine.FilterData(mainInputBox.Text, groupG.Type, 0);
-            List<SearchItem> list = new List<SearchItem>();
-            resultGroups.ForEach(group =>
-            {
-                if (group.Items.Count == 0)
-                    return;
-                
-                list.Add(new Group(group.TypeName, group.Type));
-                foreach (var file in group.Items)
-                {
-                    list.Add(new SearchItemSmallTitle(file));
-                }
-            });
+            Group group = (Group) ((TextBlock) sender).DataContext;
+            // todo Add button Show All types (save group.Type)
+            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterData(mainInputBox.Text, group.Type, 0));
             listBox.ItemsSource = list;
         }
 
         private void OnSearchInput(object sender, TextChangedEventArgs e)
         {
+            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterData(mainInputBox.Text));
+            listBox.ItemsSource = list;
+        }
+
+        private List<SearchItem> GroupToSearchItem(List<GroupSearchItems> items)
+        {
             List<SearchItem> list = new List<SearchItem>();
-            List<GroupSearchItems> resultGroups = searchEngine.FilterData(mainInputBox.Text);
-            resultGroups.ForEach(group =>
+            items.ForEach(group =>
             {
                 if (group.Items.Count == 0)
                     return;
-                
+
                 list.Add(new Group(group.TypeName, group.Type));
                 foreach (var file in group.Items)
                 {
                     list.Add(new SearchItemSmallTitle(file));
                 }
             });
-
-            listBox.ItemsSource = list;
+            return list;
         }
 
         private void MainInputBox_OnKeyUp(object sender, KeyEventArgs e)
