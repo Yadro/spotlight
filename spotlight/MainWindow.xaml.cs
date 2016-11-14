@@ -24,18 +24,19 @@ namespace spotlight
             List<SearchItem> items = new List<SearchItem>();
             items.Add(new Groups("Лучшее соответсвтие"));
 
-            foreach (var path in searchEngine.FileList)
+            /*foreach (var path in searchEngine.FileList)
             {
                 items.Add(new FileInformation(path));
             }
 
             FileInformations = items;
-            listBox.ItemsSource = items;
+            listBox.ItemsSource = items;*/
         }
 
         private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            FileInformation fileInformation = (FileInformation) ((Grid) sender).DataContext;
+            SearchItemTile dataContext = (SearchItemTile) ((Grid)sender).DataContext;
+            FileInformation fileInformation = dataContext.file;
             try
             {
                 Process.Start(fileInformation.FileLocation);
@@ -48,39 +49,15 @@ namespace spotlight
 
         private void OnSearchInput(object sender, TextChangedEventArgs e)
         {
-            string searchText = ((TextBox) sender).Text.ToLower();
-            listBox.ItemsSource = FileInformations.Where(file =>
-            {
-                string[] strings;
-                if (file is FileInformation)
-                {
-                    strings = ((FileInformation) file).DisplayName.ToLower().Split(' ');
-                } else if (file is Groups)
-                {
-                    Groups group = (Groups) file;
-                    strings = group.Name.ToLower().Split(' ');
-                }
-                else
-                {
-                    strings = new string[0];
-                }
-                foreach (string s in strings)
-                {
-                    if (s.StartsWith(searchText))
-                        return true;
-                }
-                return false;
-            });
-            
             List<SearchItem> list = new List<SearchItem>();
-            List<GroupSearchItems> resultGroups = searchEngine.FilterData(searchText);
+            List<GroupSearchItems> resultGroups = searchEngine.FilterData(((TextBox)sender).Text);
             resultGroups.ForEach(group =>
             {
                 list.Add(new Groups(group.TypeName));
                 int i = 0;
                 foreach (var file in group.Items)
                 {
-                    list.Add(new FileInformationSmall(file.FileLocation));
+                    list.Add(new SearchItemSmallTitle(file));
                     i++;
                 }
                 if (i == 0) list.RemoveAt(list.Count - 1); // todo fix this shit

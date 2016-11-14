@@ -77,28 +77,28 @@
                     </Style.Triggers>
                 </Style>
 
-                <DataTemplate DataType="{x:Type listItem:FileInformation}">
+                <DataTemplate DataType="{x:Type listItem:SearchItemTile}">
                     <Grid MouseUp="UIElement_OnMouseUp">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding Icon}" Margin="0,0,12,0" />
+                        <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding file.Icon}" Margin="0,0,12,0" />
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding DisplayName}" FontSize="15" Margin="0,5,0,0" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding FileLocation}" FontSize="13" Margin="0,2,0,0" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding file.DisplayName}" FontSize="15" Margin="0,5,0,0" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding file.FileLocation}" FontSize="13" Margin="0,2,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
 
-                <DataTemplate DataType="{x:Type listItem:FileInformationSmall}">
+                <DataTemplate DataType="{x:Type listItem:SearchItemSmallTitle}">
                     <Grid MouseUp="UIElement_OnMouseUp">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <Image Grid.Column="0" Height="15" Width="15" Source="{Binding Icon}" Margin="0,-2,12,0" />
-                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontSize="15" Margin="0,-5,0,-5"
+                        <Image Grid.Column="0" Height="15" Width="15" Source="{Binding file.Icon}" Margin="0,-2,12,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding file.DisplayName}" FontSize="15" Margin="0,-5,0,-5"
                                    TextWrapping="Wrap" />
                     </Grid>
                 </DataTemplate>
