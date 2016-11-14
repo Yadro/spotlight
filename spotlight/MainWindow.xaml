@@ -23,7 +23,7 @@
     </Window.Resources>
 
     <Window.Background>
-        <SolidColorBrush Opacity="1" Color="Black" />
+        <SolidColorBrush Opacity="1" Color="#f3f3f3" />
     </Window.Background>
 
     <Grid>
@@ -59,7 +59,7 @@
                  ItemsSource="{Binding Path=MixedList}">
             <ListBox.Resources>
                 <Style TargetType="ListBox">
-                    <Setter Property="Background" Value="#f3f3f3" />
+                    <Setter Property="Background" Value="White" />
                     <Setter Property="Border.BorderThickness" Value="0" />
                 </Style>
                 <Style TargetType="ListBoxItem">
