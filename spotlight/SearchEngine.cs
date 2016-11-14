@@ -6,10 +6,23 @@ namespace spotlight
     public class SearchEngine
     {
         private const string AppsPath = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs";
-        private string[] cachedFileList;
+        public List<string> FileList { get; }
+
 
         public SearchEngine()
         {
+            string[] paths = {
+                "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+                @"E:\Downloads\",
+                @"E:\Documents\",
+                @"E:\MyProjects",
+                @"E:\Dropbox\"
+            };
+            FileList = new List<string>();
+            foreach (var path in paths)
+            {
+                FileList.AddRange(GetFileListDeep(path, "*", 2));
+            }
         }
 
         List<string> GetFileList(string[] folders)
@@ -22,22 +35,38 @@ namespace spotlight
             return result;
         }
 
-        public List<string> GetFileListDeep(string path)
+        public List<string> GetFileList(string path)
         {
-            return GetFileListDeep(path, "*", new List<string>());
+            return GetFileListDeep(path, "*", -1);
         }
 
-        public List<string> GetFileListDeep(string path, string filter)
+        private struct SearchDeep
         {
-            return GetFileListDeep(path, filter, new List<string>());
+            public int Deep;
+            public int CurrentDeep;
         }
 
-        private List<string> GetFileListDeep(string path, string filter, List<string> cache)
+        public List<string> GetFileListDeep(string path, string filter, int deepSize)
         {
-            string[] dirs = Directory.GetDirectories(path);
-            foreach (var dir in dirs)
+            SearchDeep deep = new SearchDeep()
             {
-                cache = GetFileListDeep(dir, filter, cache);
+                CurrentDeep = 0,
+                Deep = deepSize
+            };
+            return GetFileListDeep(path, filter, deep, new List<string>());
+        }
+
+        private List<string> GetFileListDeep(string path, string filter, SearchDeep deep, List<string> cache)
+        {
+            if (deep.CurrentDeep < deep.Deep || deep.Deep == -1)
+            {
+                string[] dirs = Directory.GetDirectories(path);
+                SearchDeep searchDeep = deep;
+                searchDeep.CurrentDeep += 1;
+                foreach (var dir in dirs)
+                {
+                    cache = GetFileListDeep(dir, filter, searchDeep, cache);
+                }
             }
             string[] files = Directory.GetFiles(path, filter);
             cache.AddRange(files);

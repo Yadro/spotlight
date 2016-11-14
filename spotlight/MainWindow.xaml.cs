@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
@@ -17,10 +20,16 @@ namespace spotlight
             InitializeComponent();
 
             var searchEngine = new SearchEngine();
-            var files = searchEngine.GetFileListDeep("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs");
+            var files = searchEngine.GetFileList("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs");
             List<SearchListItem> items = new List<SearchListItem>();
             items.Add(new Groups("Лучшее соответсвтие"));
-            int i = 0;
+
+            foreach (var path in searchEngine.FileList)
+            {
+                items.Add(new FileInformation(path));
+            }
+
+            /*int i = 0;
             foreach (string file in files)
             {
                 if (i % 3 == 0 || i % 4 == 0)
@@ -28,7 +37,8 @@ namespace spotlight
                 else
                     items.Add(new FileInformation(file));
                 i++;
-            }
+            }*/
+
             FileInformations = items;
             listBox.ItemsSource = items;
         }
@@ -36,7 +46,14 @@ namespace spotlight
         private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
             FileInformation fileInformation = (FileInformation) ((Grid) sender).DataContext;
-            Process.Start(fileInformation.FileLocation);
+            try
+            {
+                Process.Start(fileInformation.FileLocation);
+            }
+            catch (Win32Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private void OnSearchInput(object sender, TextChangedEventArgs e)

@@ -9,17 +9,29 @@ namespace spotlight.ListItem
 {
     public class FileInformation : SearchListItem
     {
-        public string FileLocation { get; }
-        public string DisplayName { get; }
-        public string Extension { get; }
-        public ImageSource Icon { get; }
-
         public FileInformation(string fileLocation)
         {
             FileLocation = fileLocation;
-            DisplayName = Path.GetFileNameWithoutExtension(FileLocation);
-            Extension = Path.GetExtension(FileLocation);
-            Icon = GetAssociatedIcon(FileLocation);
+        }
+
+        public string FileLocation { get; }
+
+        private string displayName;
+        public string DisplayName
+        {
+            get { return displayName ?? (displayName = Path.GetFileNameWithoutExtension(FileLocation)); }
+        }
+
+        private string extension;
+        public string Extension
+        {
+            get { return extension ?? (extension = Path.GetExtension(FileLocation)); }
+        }
+
+        private ImageSource icon;
+        public ImageSource Icon
+        {
+            get { return icon ?? (icon = GetAssociatedIcon(FileLocation)); }
         }
 
         private static ImageSource GetAssociatedIcon(string fileName)
