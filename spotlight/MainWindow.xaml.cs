@@ -23,28 +23,56 @@ namespace spotlight
 
         private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            SearchItemTile dataContext = (SearchItemTile) ((Grid)sender).DataContext;
-            FileInformation fileInformation = dataContext.file;
-            try
+            object data = ((Grid) sender).DataContext;
+
+            if (data is SearchItemTile)
             {
-                Process.Start(fileInformation.FileLocation);
-            }
-            catch (Win32Exception exception)
+                SearchItemTile dataContext = (SearchItemTile) data;
+                FileInformation fileInformation = dataContext.file;
+                try
+                {
+                    Process.Start(fileInformation.FileLocation);
+                }
+                catch (Win32Exception exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+            } else if (data is Group)
             {
-                Console.WriteLine(exception.Message);
+                Group group = (Group) data;
+                listBox.ItemsSource = searchEngine.FilterData(mainInputBox.Text, group.Type, 3);
             }
         }
 
-        private void OnSearchInput(object sender, TextChangedEventArgs e)
+        private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
+            Group groupG = (Group) ((TextBlock) sender).DataContext;
+            List<GroupSearchItems> resultGroups = searchEngine.FilterData(mainInputBox.Text, groupG.Type, 3);
             List<SearchItem> list = new List<SearchItem>();
-            List<GroupSearchItems> resultGroups = searchEngine.FilterData(((TextBox)sender).Text);
             resultGroups.ForEach(group =>
             {
                 if (group.Items.Count == 0)
                     return;
                 
-                list.Add(new Groups(group.TypeName));
+                list.Add(new Group(group.TypeName, group.Type));
+                foreach (var file in group.Items)
+                {
+                    list.Add(new SearchItemSmallTitle(file));
+                }
+            });
+            listBox.ItemsSource = list;
+        }
+
+        private void OnSearchInput(object sender, TextChangedEventArgs e)
+        {
+            List<SearchItem> list = new List<SearchItem>();
+            List<GroupSearchItems> resultGroups = searchEngine.FilterData(mainInputBox.Text);
+            resultGroups.ForEach(group =>
+            {
+                if (group.Items.Count == 0)
+                    return;
+                
+                list.Add(new Group(group.TypeName, group.Type));
                 foreach (var file in group.Items)
                 {
                     list.Add(new SearchItemSmallTitle(file));

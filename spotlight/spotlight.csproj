@@ -65,7 +65,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ListItem\Groups.cs" />
+    <Compile Include="ListItem\Group.cs" />
     <Compile Include="ListItem\SearchItemSmallTitle.cs" />
     <Compile Include="ListItem\SearchItemTile.cs" />
     <Compile Include="SearchEngine.cs" />

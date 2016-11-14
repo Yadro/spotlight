@@ -8,6 +8,7 @@ namespace spotlight
 {
     public enum EFileType
     {
+        All,
         App,
         Document,
         Images,
@@ -145,10 +146,19 @@ namespace spotlight
 
         public List<GroupSearchItems> FilterData(string filter)
         {
+            return FilterData(filter, EFileType.All, 3);
+        }
+
+        public List<GroupSearchItems> FilterData(string filter, EFileType type, int resultCount)
+        {
             string[] filtres = filter.ToLower().Split(' ');
             List<GroupSearchItems> result = new List<GroupSearchItems>();
             foreach (GroupSearchItems group in Groups)
             {
+                if (!EFileType.All.Equals(type))
+                    if (group.Type != type)
+                        continue;
+
                 List<FileInformation> groupFiles = new List<FileInformation>();
                 foreach (FileInformation file in group.Items)
                 {
@@ -156,8 +166,14 @@ namespace spotlight
                     if (Search(fileName, filtres))
                     {
                         /*string name = fileName.Aggregate((bas, substr) => $"{bas} {substr}"); todo Select find pattern*/
-                        if (groupFiles.Count < 3)
-                            groupFiles.Add(file);
+                        if (resultCount > 0)
+                        {
+                            if (groupFiles.Count < resultCount)
+                                groupFiles.Add(file);
+                            else 
+                                break;
+                        }
+                            
                     }
                 }
                 result.Add(new GroupSearchItems()
