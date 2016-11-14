@@ -6,9 +6,10 @@
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:spotlight"
                       mc:Ignorable="d"
-                      BorderBrush="{DynamicResource AccentColorBrush}"
-                      BorderThickness="1"
-                      Title="MainWindow" Height="321.5" Width="483">
+                      Title="MainWindow" Height="321.5" Width="483"
+
+                      WindowButtonCommandsOverlayBehavior="Always"
+                      WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -18,27 +19,38 @@
     </Window.Resources>
 
     <Window.Background>
-        <SolidColorBrush Opacity="0.75" Color="{x:Static SystemParameters.WindowGlassColor}"/>
+        <SolidColorBrush Opacity="1" Color="{x:Static SystemParameters.WindowGlassColor}" />
     </Window.Background>
 
     <Grid>
-        <Rectangle Height="20" Width="20" Margin="10,21,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Rectangle.Fill>
-                <VisualBrush Visual="{StaticResource appbar_magnify}"/>
-            </Rectangle.Fill>
+        <Rectangle Width="20" Height="20" HorizontalAlignment="Left" Margin="26,21,0,0" Fill="White" VerticalAlignment="Top">
+            <Rectangle.OpacityMask>
+                <VisualBrush Visual="{StaticResource appbar_magnify}" />
+            </Rectangle.OpacityMask>
         </Rectangle>
         <TextBox x:Name="mainInputBox"
                  Controls:TextBoxHelper.Watermark="Search"
-                 Controls:TextBoxHelper.ClearTextButton="True" 
+                 Controls:TextBoxHelper.ClearTextButton="False"
                  
-                 Foreground="Azure" Background="Transparent" BorderThickness="0"
+                 Foreground="White" Background="Transparent" BorderThickness="0"
+                 CaretBrush="White" SelectionBrush="White"
                  
-                 FontSize="22" Margin="39,0,41,243" TextWrapping="Wrap"
+                 FontSize="22" Margin="57,10,26,0" TextWrapping="Wrap"
                  TextChanged="OnSearchInput"
                  KeyUp="MainInputBox_OnKeyUp"
-                 Text="" Height="36" VerticalAlignment="Bottom" 
-        />
-        <ListBox x:Name="listBox" Margin="10,56,10,10">
+                 Text="" Height="36" VerticalAlignment="Top" />
+
+        <ListBox x:Name="listBox" Margin="26,56,26,25">
+            <ListBox.Resources>
+                <Style TargetType="ListBox">
+                    <Setter Property="Background" Value="AliceBlue" />
+                    <Setter Property="Border.BorderThickness" Value="0" />
+                </Style>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="AliceBlue" />
+                    <Setter Property="Border.BorderThickness" Value="0" />
+                </Style>
+            </ListBox.Resources>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="2" MouseUp="UIElement_OnMouseUp">

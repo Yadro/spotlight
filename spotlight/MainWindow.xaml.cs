@@ -35,15 +35,24 @@ namespace spotlight
 
         private void OnSearchInput(object sender, TextChangedEventArgs e)
         {
-            string text = ((TextBox) sender).Text;
-            listBox.ItemsSource = FileInformations.Where(file => (file.DisplayName.ToLower().StartsWith(text.ToLower())));
+            string text = ((TextBox) sender).Text.ToLower();
+            listBox.ItemsSource = FileInformations.Where(file =>
+            {
+                string[] strings = file.DisplayName.ToLower().Split(' ');
+                foreach (string s in strings)
+                {
+                    if (s.StartsWith(text))
+                        return true;
+                }
+                return false;
+            });
         }
 
         private void MainInputBox_OnKeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Down)
             {
-                
+                listBox.Focus();
             }
         }
     }

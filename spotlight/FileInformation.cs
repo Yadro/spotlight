@@ -9,43 +9,18 @@ namespace spotlight
 {
     public class FileInformation
     {
+        public string FileLocation { get; }
+        public string DisplayName { get; }
+        public string Extension { get; }
+        public ImageSource Icon { get; }
+
         public FileInformation(string fileLocation)
         {
             FileLocation = fileLocation;
+            DisplayName = Path.GetFileNameWithoutExtension(FileLocation);
+            Extension = Path.GetExtension(FileLocation);
+            Icon = GetAssociatedIcon(FileLocation);
         }
-
-        public string FileLocation { get; }
-
-        public string DisplayName
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(displayName))
-                    displayName = Path.GetFileNameWithoutExtension(FileLocation);
-                return displayName;
-            }
-        }
-
-        public string Extension
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(extension))
-                    extension = Path.GetExtension(FileLocation);
-                return extension;
-            }
-        }
-
-        public ImageSource Icon
-        {
-            get { return icon ?? (icon = GetAssociatedIcon(FileLocation)); }
-        }
-
-        private string displayName;
-        private string extension;
-        private ImageSource icon;
-        private string RealFileLocation;
-        
 
         private static ImageSource GetAssociatedIcon(string fileName)
         {
