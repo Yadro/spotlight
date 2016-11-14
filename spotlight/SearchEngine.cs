@@ -12,7 +12,9 @@ namespace spotlight
         Document,
         Images,
         Music,
-        Video
+        Video,
+        Folders,
+        Other
     }
 
     public struct SearchItemStruct
@@ -25,7 +27,7 @@ namespace spotlight
     {
         public EFileType Type;
         public string TypeName;
-        public IEnumerable<FileInformation> Items;
+        public List<FileInformation> Items;
     }
 
     public struct FileTypeStruct
@@ -72,7 +74,19 @@ namespace spotlight
                 type = EFileType.Video,
                 typeName = "Видео",
                 regex = new Regex(@"\.(mp4|avi)$")
-            }
+            },
+            /*new FileTypeStruct()
+            {
+                type = EFileType.Folders,
+                typeName = "Другое",
+                regex = new Regex(@"\.^(exe|lnk|txt|docx?|pdf|djvu|mp4|avi)$")
+            },
+            new FileTypeStruct()
+            {
+                type = EFileType.Other,
+                typeName = "Другое",
+                regex = new Regex(@"\.^(exe|lnk|txt|docx?|pdf|djvu|mp4|avi)$")
+            },*/
         };
 
         public SearchEngine()
@@ -97,11 +111,12 @@ namespace spotlight
         {
             foreach (FileTypeStruct fileType in FileTypes)
             {
+                // todo отсеивать найденные значения
                 IEnumerable<FileInformation> items =
                     FileList.Where(path => fileType.regex.IsMatch(path)).Select(path => new FileInformation(path));
                 Groups.Add(new GroupSearchItems()
                 {
-                    Items = items,
+                    Items = new List<FileInformation>(items),
                     Type = fileType.type,
                     TypeName = fileType.typeName
                 });
@@ -124,6 +139,7 @@ namespace spotlight
                         {
                             if (subFileName.StartsWith(subFilter))
                             {
+                                /*string name = fileName.Aggregate((bas, substr) => $"{bas} {substr}"); todo Select find pattern*/
                                 groupFiles.Add(file);
                                 if (groupFiles.Count >= 3)
                                 {
