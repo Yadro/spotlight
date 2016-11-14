@@ -29,16 +29,6 @@ namespace spotlight
                 items.Add(new FileInformation(path));
             }
 
-            /*int i = 0;
-            foreach (string file in files)
-            {
-                if (i % 3 == 0 || i % 4 == 0)
-                    items.Add(new FileInformationSmall(file));
-                else
-                    items.Add(new FileInformation(file));
-                i++;
-            }*/
-
             FileInformations = items;
             listBox.ItemsSource = items;
         }
