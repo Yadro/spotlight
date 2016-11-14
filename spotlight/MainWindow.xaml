@@ -5,9 +5,13 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:spotlight"
+                      xmlns:listItem="clr-namespace:spotlight.ListItem"
                       mc:Ignorable="d"
                       Title="MainWindow" Height="321.5" Width="483"
 
+                      BorderBrush="{DynamicResource AccentColorBrush}"
+                      BorderThickness="0"
+                      GlowBrush="Black"
                       WindowButtonCommandsOverlayBehavior="Always"
                       WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -19,53 +23,90 @@
     </Window.Resources>
 
     <Window.Background>
-        <SolidColorBrush Opacity="1" Color="{x:Static SystemParameters.WindowGlassColor}" />
+        <SolidColorBrush Opacity="1" Color="Black" />
     </Window.Background>
 
     <Grid>
-        <Rectangle Width="20" Height="20" HorizontalAlignment="Left" Margin="26,21,0,0" Fill="White" VerticalAlignment="Top">
-            <Rectangle.OpacityMask>
-                <VisualBrush Visual="{StaticResource appbar_magnify}" />
-            </Rectangle.OpacityMask>
-        </Rectangle>
+        <Border BorderThickness="0"
+                VerticalAlignment="Top"
+                Background="#f3f3f3"
+                Height="40" />
+
         <TextBox x:Name="mainInputBox"
-                 Controls:TextBoxHelper.Watermark="Search"
+                 Controls:TextBoxHelper.Watermark="Поиск в Windows"
                  Controls:TextBoxHelper.ClearTextButton="False"
-                 
-                 Foreground="White" Background="Transparent" BorderThickness="0"
-                 CaretBrush="White" SelectionBrush="White"
-                 
-                 FontSize="22" Margin="57,10,26,0" TextWrapping="Wrap"
+
+                 VerticalAlignment="Top"
+                 Padding="0"
+                 Margin="13,3,10,0"
+                 BorderThickness="0"
+
+                 Background="#f3f3f3"
+                 Foreground="Black"
+                 CaretBrush="Black"
+                 SelectionBrush="#0078d7"
+
+                 FontSize="18"
+                 TextWrapping="Wrap"
+
                  TextChanged="OnSearchInput"
                  KeyUp="MainInputBox_OnKeyUp"
-                 Text="" Height="36" VerticalAlignment="Top" />
 
-        <ListBox x:Name="listBox" Margin="26,56,26,25">
+                 Text="" />
+
+
+        <ListBox x:Name="listBox" Margin="0,40,0,0"
+                 ItemsSource="{Binding Path=MixedList}">
             <ListBox.Resources>
                 <Style TargetType="ListBox">
-                    <Setter Property="Background" Value="AliceBlue" />
+                    <Setter Property="Background" Value="#f3f3f3" />
                     <Setter Property="Border.BorderThickness" Value="0" />
                 </Style>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Background" Value="AliceBlue" />
+                    <Setter Property="Padding" Value="12" />
+                    <Setter Property="Background" Value="White" />
                     <Setter Property="Border.BorderThickness" Value="0" />
+                    <Style.Triggers>
+                        <!-- TODO -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="Black" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#e5e5e5" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
-            </ListBox.Resources>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="2" MouseUp="UIElement_OnMouseUp">
+
+                <DataTemplate DataType="{x:Type listItem:FileInformation}">
+                    <Grid MouseUp="UIElement_OnMouseUp">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding Icon}" Margin="0,0,10,0" />
+                        <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding Icon}" Margin="0,0,12,0" />
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding DisplayName}" />
-                            <TextBlock Text="{Binding FileLocation}" />
+                            <TextBlock Text="{Binding DisplayName}" FontSize="15" Margin="0,5,0,0" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding FileLocation}" FontSize="13" Margin="0,2,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
+
+                <DataTemplate DataType="{x:Type listItem:FileInformationSmall}">
+                    <Grid MouseUp="UIElement_OnMouseUp">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Height="15" Width="15" Source="{Binding Icon}" Margin="0,-2,12,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontSize="15" Margin="0,-5,0,-5"
+                                   TextWrapping="Wrap" />
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type listItem:Groups}">
+                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Margin="0,-5,0,-5" />
+                </DataTemplate>
+            </ListBox.Resources>
         </ListBox>
     </Grid>
 

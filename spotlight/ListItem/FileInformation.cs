@@ -5,9 +5,9 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace spotlight
+namespace spotlight.ListItem
 {
-    public class FileInformation
+    public class FileInformation : SearchListItem
     {
         public string FileLocation { get; }
         public string DisplayName { get; }
