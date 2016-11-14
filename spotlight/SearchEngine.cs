@@ -146,40 +146,28 @@ namespace spotlight
         public List<GroupSearchItems> FilterData(string filter)
         {
             string[] filtres = filter.ToLower().Split(' ');
-            List<GroupSearchItems> groupsFiltred = new List<GroupSearchItems>();
-            Groups.ForEach(group =>
+            List<GroupSearchItems> result = new List<GroupSearchItems>();
+            foreach (GroupSearchItems group in Groups)
             {
                 List<FileInformation> groupFiles = new List<FileInformation>();
                 foreach (FileInformation file in group.Items)
                 {
                     string[] fileName = file.DisplayName.ToLower().Split(' ');
-                    foreach (var subFilter in filtres)
+                    if (Search(fileName, filtres))
                     {
-                        foreach (var subFileName in fileName)
-                        {
-                            if (subFileName.StartsWith(subFilter))
-                            {
-                                /*string name = fileName.Aggregate((bas, substr) => $"{bas} {substr}"); todo Select find pattern*/
-                                groupFiles.Add(file);
-                                if (groupFiles.Count >= 3)
-                                {
-                                    goto NextGroup;
-                                }
-                                goto NextFile;
-                            }
-                        }
+                        /*string name = fileName.Aggregate((bas, substr) => $"{bas} {substr}"); todo Select find pattern*/
+                        if (groupFiles.Count < 3)
+                            groupFiles.Add(file);
                     }
-                    NextFile:;
                 }
-                NextGroup:
-                groupsFiltred.Add(new GroupSearchItems()
+                result.Add(new GroupSearchItems()
                 {
                     Items = groupFiles,
                     Type = group.Type,
                     TypeName = group.TypeName
                 });
-            });
-            return groupsFiltred;
+            }
+            return result;
         }
 
         public List<string> GetFileList(string path)
@@ -218,6 +206,15 @@ namespace spotlight
             string[] files = Directory.GetFiles(path, filter);
             cache.AddRange(files);
             return cache;
+        }
+
+        private bool Search(string[] source, string[] search)
+        {
+            foreach (var str in source)
+                foreach (var subSearch in search)
+                    if (str.StartsWith(subSearch))
+                        return true;
+            return false;
         }
     }
 }
