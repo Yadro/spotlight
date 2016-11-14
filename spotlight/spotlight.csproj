@@ -68,7 +68,7 @@
     <Compile Include="ListItem\Groups.cs" />
     <Compile Include="ListItem\FileInformationSmall.cs" />
     <Compile Include="SearchEngine.cs" />
-    <Compile Include="ListItem\SearchListItem.cs" />
+    <Compile Include="ListItem\SearchItem.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

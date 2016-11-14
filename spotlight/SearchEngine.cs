@@ -1,17 +1,84 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using spotlight.ListItem;
 
 namespace spotlight
 {
+    public enum EFileType
+    {
+        App,
+        Document,
+        Images,
+        Music,
+        Video
+    }
+
+    public struct SearchItemStruct
+    {
+        public EFileType Type;
+        public SearchItem Item;
+    }
+
+    public struct GroupSearchItems
+    {
+        public EFileType Type;
+        public string TypeName;
+        public IEnumerable<FileInformation> Items;
+    }
+
+    public struct FileTypeStruct
+    {
+        public EFileType type;
+        public string typeName;
+        public Regex regex;
+    }
+
     public class SearchEngine
     {
-        private const string AppsPath = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs";
         public List<string> FileList { get; }
+        public List<SearchItemStruct> SearchItems = new List<SearchItemStruct>();
+        public List<GroupSearchItems> Groups = new List<GroupSearchItems>();
 
+        private FileTypeStruct[] FileTypes =
+        {
+            new FileTypeStruct()
+            {
+                type = EFileType.App,
+                typeName = "Приложения",
+                regex = new Regex(@"\.(exe|lnk)$")
+            },
+            new FileTypeStruct()
+            {
+                type = EFileType.Document,
+                typeName = "Документы",
+                regex = new Regex(@"\.(txt|docx?|pdf|djvu)$")
+            },
+            new FileTypeStruct()
+            {
+                type = EFileType.Images,
+                typeName = "Изображения",
+                regex = new Regex(@"\.(png|jpe?g|gif)$")
+            },
+            new FileTypeStruct()
+            {
+                type = EFileType.Music,
+                typeName = "Музыка",
+                regex = new Regex(@"\.(mp\d|wav)$")
+            },
+            new FileTypeStruct()
+            {
+                type = EFileType.Video,
+                typeName = "Видео",
+                regex = new Regex(@"\.(mp4|avi)$")
+            }
+        };
 
         public SearchEngine()
         {
-            string[] paths = {
+            string[] paths =
+            {
                 "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
                 @"E:\Downloads\",
                 @"E:\Documents\",
@@ -23,16 +90,60 @@ namespace spotlight
             {
                 FileList.AddRange(GetFileListDeep(path, "*", 2));
             }
+            GenereateData();
         }
 
-        List<string> GetFileList(string[] folders)
+        private void GenereateData()
         {
-            List<string> result = new List<string>();
-            foreach (var folder in folders)
+            foreach (FileTypeStruct fileType in FileTypes)
             {
-               // Directory.GetDirectories()
+                IEnumerable<FileInformation> items =
+                    FileList.Where(path => fileType.regex.IsMatch(path)).Select(path => new FileInformation(path));
+                Groups.Add(new GroupSearchItems()
+                {
+                    Items = items,
+                    Type = fileType.type,
+                    TypeName = fileType.typeName
+                });
             }
-            return result;
+        }
+
+        public List<GroupSearchItems> FilterData(string filter)
+        {
+            string[] filtres = filter.ToLower().Split(' ');
+            List<GroupSearchItems> groupsFiltred = new List<GroupSearchItems>();
+            Groups.ForEach(group =>
+            {
+                List<FileInformation> groupFiles = new List<FileInformation>();
+                foreach (FileInformation file in group.Items)
+                {
+                    string[] fileName = file.DisplayName.ToLower().Split(' ');
+                    foreach (var subFilter in filtres)
+                    {
+                        foreach (var subFileName in fileName)
+                        {
+                            if (subFileName.StartsWith(subFilter))
+                            {
+                                groupFiles.Add(file);
+                                if (groupFiles.Count >= 3)
+                                {
+                                    goto NextGroup;
+                                }
+                                goto NextFile;
+                            }
+                        }
+                    }
+                    NextFile:;
+                }
+                NextGroup:
+                groupsFiltred.Add(new GroupSearchItems()
+                {
+                    Items = groupFiles,
+                    Type = group.Type,
+                    TypeName = group.TypeName
+                });
+            });
+            return groupsFiltred;
         }
 
         public List<string> GetFileList(string path)
@@ -48,7 +159,7 @@ namespace spotlight
 
         public List<string> GetFileListDeep(string path, string filter, int deepSize)
         {
-            SearchDeep deep = new SearchDeep()
+            SearchDeep deep = new SearchDeep
             {
                 CurrentDeep = 0,
                 Deep = deepSize

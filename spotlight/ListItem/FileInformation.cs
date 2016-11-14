@@ -7,7 +7,7 @@ using System.Windows.Media.Imaging;
 
 namespace spotlight.ListItem
 {
-    public class FileInformation : SearchListItem
+    public class FileInformation : SearchItem
     {
         public FileInformation(string fileLocation)
         {

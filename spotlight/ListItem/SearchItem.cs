@@ -1,6 +1,6 @@
 ﻿namespace spotlight.ListItem
 {
-    public class SearchListItem
+    public class SearchItem
     {
 
     }

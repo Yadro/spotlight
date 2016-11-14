@@ -1,6 +1,6 @@
 ﻿namespace spotlight.ListItem
 {
-    class Groups: SearchListItem
+    class Groups: SearchItem
     {
         public string Name { get; }
 
