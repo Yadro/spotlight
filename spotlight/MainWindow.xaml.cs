@@ -37,17 +37,13 @@ namespace spotlight
                 {
                     Console.WriteLine(exception.Message);
                 }
-            } else if (data is Group)
-            {
-                Group group = (Group) data;
-                listBox.ItemsSource = searchEngine.FilterData(mainInputBox.Text, group.Type, 3);
             }
         }
 
         private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
             Group groupG = (Group) ((TextBlock) sender).DataContext;
-            List<GroupSearchItems> resultGroups = searchEngine.FilterData(mainInputBox.Text, groupG.Type, 3);
+            List<GroupSearchItems> resultGroups = searchEngine.FilterData(mainInputBox.Text, groupG.Type, 0);
             List<SearchItem> list = new List<SearchItem>();
             resultGroups.ForEach(group =>
             {

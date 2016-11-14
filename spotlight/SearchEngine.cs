@@ -170,10 +170,11 @@ namespace spotlight
                         {
                             if (groupFiles.Count < resultCount)
                                 groupFiles.Add(file);
-                            else 
+                            else
                                 break;
                         }
-                            
+                        else
+                            groupFiles.Add(file);
                     }
                 }
                 result.Add(new GroupSearchItems()
