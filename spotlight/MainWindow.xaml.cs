@@ -23,28 +23,25 @@ namespace spotlight
 
         private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            object data = ((Grid) sender).DataContext;
-
-            if (data is SearchItemTile)
+            SearchItemTile dataContext = ((SearchItemTile) ((Grid) sender).DataContext);
+            FileInformation fileInformation = dataContext.file;
+            try
             {
-                SearchItemTile dataContext = (SearchItemTile) data;
-                FileInformation fileInformation = dataContext.file;
-                try
-                {
-                    Process.Start(fileInformation.FileLocation);
-                }
-                catch (Win32Exception exception)
-                {
-                    Console.WriteLine(exception.Message);
-                }
+                Process.Start(fileInformation.FileLocation);
+            }
+            catch (Win32Exception exception)
+            {
+                Console.WriteLine(exception.Message);
             }
         }
 
         private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
             Group group = (Group) ((TextBlock) sender).DataContext;
-            // todo Add button Show All types (save group.Type)
             List<SearchItem> list = GroupToSearchItem(searchEngine.FilterData(mainInputBox.Text, group.Type, 0));
+
+            // todo Add button Show All types (save group.Type)
+            list.Add(new Group("Показать все результаты", EFileType.All));
             listBox.ItemsSource = list;
         }
 
