@@ -23,7 +23,7 @@ namespace spotlight
         protected override void OnDeactivated(EventArgs e)
         {
             base.OnDeactivated(e);
-            Hide();
+            //Hide();
         }
 
         private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
@@ -43,7 +43,7 @@ namespace spotlight
         private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
             Group group = (Group) ((TextBlock) sender).DataContext;
-            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterData(mainInputBox.Text, group.Type, 0));
+            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterRangeData(mainInputBox.Text, group.Type, 0));
 
             // todo Add button Show All types (save group.Type)
             list.Add(new Group("Показать все результаты", EFileType.All));
@@ -52,7 +52,7 @@ namespace spotlight
 
         private void OnSearchInput(object sender, TextChangedEventArgs e)
         {
-            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterData(mainInputBox.Text));
+            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterRangeData(mainInputBox.Text, EFileType.All, 3));
             listBox.ItemsSource = list;
         }
 

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using spotlight.ListItem;
 
@@ -30,6 +32,10 @@ namespace spotlight
         public EFileType Type;
         public string TypeName;
         public List<FileInformation> Items;
+        public override string ToString()
+        {
+            return $"Type = {Type}, Count = {Items.Count}";
+        }
     }
 
     public struct FileTypeStruct
@@ -149,12 +155,16 @@ namespace spotlight
             return FilterData(filter, EFileType.All, 3);
         }
 
-        class FileRange
+        private class RangeSearchResult
         {
             private struct FileRangeStruct
             {
-                public List<FileInformation> Files;
-                public int Range;
+                public readonly List<FileInformation> Files;
+                public readonly int Range;
+                public override string ToString()
+                {
+                    return $"Range = {Range}, Count = {Files.Count}";
+                }
 
                 public FileRangeStruct(List<FileInformation> files, int range)
                 {
@@ -169,7 +179,10 @@ namespace spotlight
             {
                 FileRangeStruct rangedFiles = data.Find(item => item.Range == range);
                 if (rangedFiles.Files == null)
-                    data.Add(new FileRangeStruct(new List<FileInformation>() {file}, range));
+                {
+                    data.Add(new FileRangeStruct(new List<FileInformation>() { file }, range));
+                    data.Sort((a, b) => a.Range.CompareTo(b.Range));
+                }
                 else
                     rangedFiles.Files.Add(file);
             }
@@ -179,6 +192,68 @@ namespace spotlight
                 FileRangeStruct rangedFiles = data.Find(item => item.Range == range);
                 return rangedFiles.Files ?? new List<FileInformation>();
             }
+
+            public List<FileInformation> GetNum(int size)
+            {
+                if (size == 0)
+                {
+                    List<FileInformation> all = new List<FileInformation>();
+                    data.ForEach(range => all.AddRange(range.Files));
+                    return all;
+                }
+                int left = size;
+                List<FileInformation> result = new List<FileInformation>();
+                foreach (FileRangeStruct range in data)
+                {
+                    List<FileInformation> files = range.Files;
+                    result.AddRange(files.GetRange(0, Math.Min(files.Count, left)));
+                    left -= result.Count;
+                    if (left < 0)
+                        break;
+                }
+                return result;
+            }
+
+            public int Total()
+            {
+                return data.Aggregate(0, (last, item) => last + item.Files.Count);
+            }
+
+            public int TotalFirstRange()
+            {
+                return data[0].Files.Count;
+            }
+        }
+
+        public List<GroupSearchItems> FilterRangeData(string filter, EFileType type, int resultCount)
+        {
+            string[] filtres = filter.ToLower().Split(' ');
+            List<GroupSearchItems> result = new List<GroupSearchItems>();
+            foreach (GroupSearchItems group in Groups)
+            {
+                if (!EFileType.All.Equals(type) && group.Type != type)
+                    continue;
+
+                RangeSearchResult rangeSearchResult = new RangeSearchResult();
+                foreach (FileInformation file in group.Items)
+                {
+                    string[] fileName = file.DisplayName.ToLower().Split(' ');
+                    int range = Search(fileName, filtres);
+                    if (range > 0)
+                    {
+                        rangeSearchResult.Add(range, file);
+                        if (resultCount > 0 && rangeSearchResult.TotalFirstRange() >= resultCount)
+                            break;
+                    }
+                }
+                result.Add(new GroupSearchItems()
+                {
+                    Items = rangeSearchResult.GetNum(resultCount),
+                    Type = group.Type,
+                    TypeName = group.TypeName
+                });
+            }
+            return result;
         }
 
         public List<GroupSearchItems> FilterData(string filter, EFileType type, int resultCount)
@@ -194,7 +269,7 @@ namespace spotlight
                 foreach (FileInformation file in group.Items)
                 {
                     string[] fileName = file.DisplayName.ToLower().Split(' ');
-                    if (Search(fileName, filtres))
+                    if (Search(fileName, filtres) != 0)
                     {
                         /*string name = fileName.Aggregate((bas, substr) => $"{bas} {substr}"); todo Select find pattern*/
                         if (resultCount > 0)
@@ -256,13 +331,17 @@ namespace spotlight
             return cache;
         }
 
-        private bool Search(string[] source, string[] search)
+        private int Search(string[] source, string[] search)
         {
+            int i = 1;
             foreach (var str in source)
+            {
                 foreach (var subSearch in search)
                     if (str.StartsWith(subSearch))
-                        return true;
-            return false;
+                        return i;
+                i++;
+            }
+            return 0;
         }
     }
 }
