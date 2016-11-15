@@ -4,8 +4,9 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using spotlight.ListItem;
 
-namespace spotlight.ListItem
+namespace spotlight
 {
     public class FileInformation : SearchItem
     {
