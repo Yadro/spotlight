@@ -149,15 +149,46 @@ namespace spotlight
             return FilterData(filter, EFileType.All, 3);
         }
 
+        class FileRange
+        {
+            private struct FileRangeStruct
+            {
+                public List<FileInformation> Files;
+                public int Range;
+
+                public FileRangeStruct(List<FileInformation> files, int range)
+                {
+                    Files = files;
+                    Range = range;
+                }
+            }
+
+            private List<FileRangeStruct> data = new List<FileRangeStruct>();
+            
+            public void Add(int range, FileInformation file)
+            {
+                FileRangeStruct rangedFiles = data.Find(item => item.Range == range);
+                if (rangedFiles.Files == null)
+                    data.Add(new FileRangeStruct(new List<FileInformation>() {file}, range));
+                else
+                    rangedFiles.Files.Add(file);
+            }
+
+            public List<FileInformation> Get(int range)
+            {
+                FileRangeStruct rangedFiles = data.Find(item => item.Range == range);
+                return rangedFiles.Files ?? new List<FileInformation>();
+            }
+        }
+
         public List<GroupSearchItems> FilterData(string filter, EFileType type, int resultCount)
         {
             string[] filtres = filter.ToLower().Split(' ');
             List<GroupSearchItems> result = new List<GroupSearchItems>();
             foreach (GroupSearchItems group in Groups)
             {
-                if (!EFileType.All.Equals(type))
-                    if (group.Type != type)
-                        continue;
+                if (!EFileType.All.Equals(type) && group.Type != type)
+                    continue;
 
                 List<FileInformation> groupFiles = new List<FileInformation>();
                 foreach (FileInformation file in group.Items)
