@@ -241,6 +241,7 @@ namespace spotlight
                     int range = Search(fileName, filtres);
                     if (range > 0)
                     {
+                        file.SelectedName = filter; // todo fix
                         rangeSearchResult.Add(range, file);
                         if (resultCount > 0 && rangeSearchResult.TotalFirstRange() >= resultCount)
                             break;

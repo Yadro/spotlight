@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
 using spotlight.ListItem;

@@ -51,5 +51,12 @@ namespace spotlight
 
             return imageSource;
         }
+
+        public string SelectedName { get; set; }
+
+        public override string ToString()
+        {
+            return $"{DisplayName}";
+        }
     }
 }
