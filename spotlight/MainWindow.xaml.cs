@@ -14,11 +14,16 @@ namespace spotlight
     public partial class MainWindow : MetroWindow
     {
         private SearchEngine searchEngine = new SearchEngine();
-        private List<SearchItem> FileInformations;
-
+        
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        protected override void OnDeactivated(EventArgs e)
+        {
+            base.OnDeactivated(e);
+            Hide();
         }
 
         private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
