@@ -127,7 +127,7 @@ namespace spotlight
         {
             foreach (FileTypeName fileType in FileType)
             {
-                if (type.Equals(fileType))
+                if (type.Equals(fileType.Type))
                     return fileType.TypeName;
             }
             return null;

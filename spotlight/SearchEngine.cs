@@ -30,7 +30,7 @@ namespace spotlight
         public List<string> FileList { get; }
         public List<SearchItemStruct> SearchItems = new List<SearchItemStruct>();
         public List<GroupSearchItems> Groups = new List<GroupSearchItems>();
-        public FileTypesList FileTypesList = new FileTypesList();
+        public static FileTypesList FileTypesList = new FileTypesList();
 
         public SearchEngine()
         {
@@ -287,7 +287,7 @@ namespace spotlight
 
         public static string GetSearchIgnoreFilter(string search)
         {
-            var match = new Regex(@"(\w+):\s?([\w\W]+)").Match(search);
+            var match = new Regex(@"(\w*?):\s?([\w\W]+)").Match(search);
             return match.Success ? match.Groups[2].Value : search;
         }
 

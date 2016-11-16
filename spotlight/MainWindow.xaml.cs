@@ -13,7 +13,7 @@ namespace spotlight
     {
         private string SearchString { get; set; }
         private SearchEngine SearchEngine = new SearchEngine();
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -47,9 +47,17 @@ namespace spotlight
             Group group = (Group) ((TextBlock) sender).DataContext;
 
             EFileType type = group.Type;
-            // todo
-            // SearchString = $"{SearchEngine.FileTypes.}: {filter}";
-
+            if (type == EFileType.All)
+            {
+                // что вернет, если запрос ": SearchString"
+                mainInputBox.Text = SearchString = filter;
+            }
+            else
+            {
+                string typeName = SearchEngine.FileTypesList.GetTypeName(type);
+                mainInputBox.Text = SearchString = $"{typeName}: {filter}";
+            }
+            
             List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(filter, group.Type, 0));
 
             // todo Add button Show All types (save group.Type)
