@@ -69,6 +69,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FileTypesList.cs" />
     <Compile Include="HighlightTextBlock.cs" />
     <Compile Include="ListItem\Group.cs" />
     <Compile Include="ListItem\SearchItemSmallTitle.cs" />

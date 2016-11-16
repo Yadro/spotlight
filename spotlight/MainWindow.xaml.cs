@@ -43,8 +43,14 @@ namespace spotlight
 
         private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
+            string filter = SearchEngine.GetSearchIgnoreFilter(mainInputBox.Text);
             Group group = (Group) ((TextBlock) sender).DataContext;
-            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(mainInputBox.Text, group.Type, 0));
+
+            EFileType type = group.Type;
+            // todo
+            // SearchString = $"{SearchEngine.FileTypes.}: {filter}";
+
+            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(filter, group.Type, 0));
 
             // todo Add button Show All types (save group.Type)
             list.Add(new Group("Показать все результаты", EFileType.All));

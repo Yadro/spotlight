@@ -2,25 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using spotlight.ListItem;
 
 namespace spotlight
 {
-    public enum EFileType
-    {
-        All,
-        App,
-        Document,
-        Images,
-        Music,
-        Video,
-        Folders,
-        Other,
-        Archive
-    }
-
     public struct SearchItemStruct
     {
         public EFileType Type;
@@ -32,17 +18,11 @@ namespace spotlight
         public EFileType Type;
         public string TypeName;
         public List<FileInformation> Items;
+
         public override string ToString()
         {
             return $"Type = {Type}, Count = {Items.Count}";
         }
-    }
-
-    public struct FileTypeStruct
-    {
-        public EFileType type;
-        public string typeName;
-        public Regex regex;
     }
 
     public class SearchEngine
@@ -50,58 +30,7 @@ namespace spotlight
         public List<string> FileList { get; }
         public List<SearchItemStruct> SearchItems = new List<SearchItemStruct>();
         public List<GroupSearchItems> Groups = new List<GroupSearchItems>();
-
-        private FileTypeStruct[] FileTypes =
-        {
-            new FileTypeStruct()
-            {
-                type = EFileType.App,
-                typeName = "Приложения",
-                regex = new Regex(@"\.(exe|lnk)$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Document,
-                typeName = "Документы",
-                regex = new Regex(@"\.(txt|docx?|pdf|djvu)$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Images,
-                typeName = "Изображения",
-                regex = new Regex(@"\.(png|jpe?g|gif)$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Music,
-                typeName = "Музыка",
-                regex = new Regex(@"\.(mp\d|wav)$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Archive,
-                typeName = "Архивы",
-                regex = new Regex(@"\.(7z|zip|rar|tar)$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Video,
-                typeName = "Видео",
-                regex = new Regex(@"\.(mp4|avi)$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Folders,
-                typeName = "Папки",
-                regex = new Regex(@"\\$")
-            },
-            new FileTypeStruct()
-            {
-                type = EFileType.Other,
-                typeName = "Другое",
-                regex = null
-            }
-        };
+        public FileTypesList FileTypesList = new FileTypesList();
 
         public SearchEngine()
         {
@@ -124,17 +53,18 @@ namespace spotlight
         private void GenereateData()
         {
             List<string> fileList = new List<string>(FileList);
-            foreach (FileTypeStruct fileType in FileTypes)
+            
+            foreach (FileTypeName fileType in FileTypesList)
             {
                 List<string> other = new List<string>();
                 List<FileInformation> items = new List<FileInformation>();
                 foreach (string path in fileList)
                 {
-                    if (fileType.regex == null)
+                    if (fileType.Regex == null)
                         items.Add(new FileInformation(path));
                     else
                     {
-                        if (fileType.regex.IsMatch(path))
+                        if (fileType.Regex.IsMatch(path))
                             items.Add(new FileInformation(path));
                         else
                             other.Add(path);
@@ -143,8 +73,8 @@ namespace spotlight
                 Groups.Add(new GroupSearchItems()
                 {
                     Items = items,
-                    Type = fileType.type,
-                    TypeName = fileType.typeName
+                    Type = fileType.Type,
+                    TypeName = fileType.TypeName
                 });
                 fileList = other;
             }
@@ -161,6 +91,7 @@ namespace spotlight
             {
                 public readonly List<FileInformation> Files;
                 public readonly int Range;
+
                 public override string ToString()
                 {
                     return $"Range = {Range}, Count = {Files.Count}";
@@ -174,13 +105,13 @@ namespace spotlight
             }
 
             private List<FileRangeStruct> data = new List<FileRangeStruct>();
-            
+
             public void Add(int range, FileInformation file)
             {
                 FileRangeStruct rangedFiles = data.Find(item => item.Range == range);
                 if (rangedFiles.Files == null)
                 {
-                    data.Add(new FileRangeStruct(new List<FileInformation>() { file }, range));
+                    data.Add(new FileRangeStruct(new List<FileInformation>() {file}, range));
                     data.Sort((a, b) => a.Range.CompareTo(b.Range));
                 }
                 else
@@ -225,23 +156,35 @@ namespace spotlight
             }
         }
 
-        public List<GroupSearchItems> FilterRangeData(string filter, EFileType type, int resultCount)
+        public List<GroupSearchItems> FilterRangeData(string filterQuery, EFileType typeQuery, int resultCount)
         {
-            string[] filtres = filter.ToLower().Split(' ');
-            List<GroupSearchItems> result = new List<GroupSearchItems>();
+            string filter;
+            EFileType type;
+            if (typeQuery != EFileType.All)
+            {
+                filter = GetSearchIgnoreFilter(filterQuery);
+                type = typeQuery;
+            }
+            else
+            {
+                SearchInputStruct searchInput = ParseSearchInput(filterQuery);
+                filter = searchInput.Search;
+                type = searchInput.Type;
+                resultCount = 10;
+            }
+
+            var result = new List<GroupSearchItems>();
             foreach (GroupSearchItems group in Groups)
             {
-                if (!EFileType.All.Equals(type) && group.Type != type)
+                if (EFileType.All != type && group.Type != type)
                     continue;
 
-                RangeSearchResult rangeSearchResult = new RangeSearchResult();
+                var rangeSearchResult = new RangeSearchResult();
                 foreach (FileInformation file in group.Items)
                 {
-                    string[] fileName = file.DisplayName.ToLower().Split(' ');
-                    int range = Search(fileName, filtres);
+                    int range = Search(file.DisplayName, filter);
                     if (range > 0)
                     {
-                        file.SelectedName = filter; // todo fix
                         rangeSearchResult.Add(range, file);
                         if (resultCount > 0 && rangeSearchResult.TotalFirstRange() >= resultCount)
                             break;
@@ -259,7 +202,6 @@ namespace spotlight
 
         public List<GroupSearchItems> FilterData(string filter, EFileType type, int resultCount)
         {
-            string[] filtres = filter.ToLower().Split(' ');
             List<GroupSearchItems> result = new List<GroupSearchItems>();
             foreach (GroupSearchItems group in Groups)
             {
@@ -269,8 +211,7 @@ namespace spotlight
                 List<FileInformation> groupFiles = new List<FileInformation>();
                 foreach (FileInformation file in group.Items)
                 {
-                    string[] fileName = file.DisplayName.ToLower().Split(' ');
-                    if (Search(fileName, filtres) != 0)
+                    if (Search(file.DisplayName, filter) != 0)
                     {
                         /*string name = fileName.Aggregate((bas, substr) => $"{bas} {substr}"); todo Select find pattern*/
                         if (resultCount > 0)
@@ -332,17 +273,54 @@ namespace spotlight
             return cache;
         }
 
-        private int Search(string[] source, string[] search)
+        public struct SearchInputStruct
         {
-            int i = 1;
-            foreach (var str in source)
+            public EFileType Type;
+            public string Search;
+
+            public SearchInputStruct(EFileType type, string search)
             {
-                foreach (var subSearch in search)
-                    if (str.StartsWith(subSearch))
-                        return i;
-                i++;
+                Type = type;
+                Search = search;
             }
-            return 0;
+        }
+
+        public static string GetSearchIgnoreFilter(string search)
+        {
+            var match = new Regex(@"(\w+):\s?([\w\W]+)").Match(search);
+            return match.Success ? match.Groups[2].Value : search;
+        }
+
+        private SearchInputStruct ParseSearchInput(string search)
+        {
+            Regex regex = new Regex(@"(\w+):\s?([\w\W]+)");
+            Match match = regex.Match(search);
+            if (match.Success)
+            {
+                EFileType? fileType = FileTypesList.GetTypeName(match.Groups[1].Value);
+                if (fileType != null)
+                    return new SearchInputStruct((EFileType)fileType, match.Groups[2].Value);
+                
+            }
+            return new SearchInputStruct(EFileType.All, search);
+        }
+
+        private int Search(string source, string search)
+        {
+            Regex regex1 = new Regex($"^{search}", RegexOptions.IgnoreCase);
+            Match match1 = regex1.Match(source);
+            if (match1.Success)
+                return 1;
+
+            Regex regex = new Regex($"{search}", RegexOptions.IgnoreCase);
+            Match match = regex.Match(source);
+            if (match.Success == false)
+                return 0;
+
+            int beginMatch = match.Index;
+            Regex spaces = new Regex(@"\w+(\W)");
+            MatchCollection matchCollection = spaces.Matches(source.Substring(0, beginMatch));
+            return matchCollection.Count + 1;
         }
     }
 }
