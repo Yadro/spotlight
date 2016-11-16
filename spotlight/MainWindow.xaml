@@ -54,9 +54,8 @@
 
                  Text="" />
 
-
         <ListBox x:Name="listBox" Margin="0,40,0,0"
-                 ItemsSource="{Binding Path=MixedList}">
+                 ItemsSource="{Binding Path=MixedList}" >
             <ListBox.Resources>
                 <Style TargetType="ListBox">
                     <Setter Property="Background" Value="White" />
@@ -85,8 +84,10 @@
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding file.Icon}" Margin="0,0,12,0" />
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding file.DisplayName}" FontSize="15" Margin="0,5,0,0" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding file.FileLocation}" FontSize="13" Margin="0,2,0,0" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding file.DisplayName}" FontSize="15" Margin="0,5,0,0"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding file.FileLocation}" FontSize="13" Margin="0,2,0,0"
+                                       TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
@@ -99,8 +100,9 @@
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Height="15" Width="15" Source="{Binding file.Icon}" Margin="0,-2,12,0" />
                         <!-- см  <Setter Property="Padding" Value="12" /> -->
-                        <local:HighlightTextBlock Grid.Column="1" Text="{Binding file.DisplayName}" HighlightText="{Binding file.SelectedName}" FontSize="15" Margin="0,-5,0,-5"
-                                   TextWrapping="Wrap" />
+                        <local:HighlightTextBlock Grid.Column="1"
+                                                  Text="{Binding file.DisplayName}"
+                                                  FontSize="15" Margin="0,-5,0,-5" TextWrapping="Wrap" />
                     </Grid>
                 </DataTemplate>
 

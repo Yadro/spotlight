@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -20,6 +19,9 @@ namespace spotlight
         public override void EndInit()
         {
             base.EndInit();
+            if (HighlightText == null)
+                return;
+
             string[] alignment = HighlightText.Split(' ');
             Inlines.Clear();
             foreach (var str in alignment)
@@ -35,6 +37,11 @@ namespace spotlight
                 });
                 Inlines.Add(Text.Substring(match.Index + match.Length));
             }
+        }
+
+        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // todo
         }
     }
 }

@@ -11,11 +11,14 @@ namespace spotlight
 {
     public partial class MainWindow : MetroWindow
     {
-        private SearchEngine searchEngine = new SearchEngine();
+        private string SearchString { get; set; }
+        private SearchEngine SearchEngine = new SearchEngine();
         
         public MainWindow()
         {
             InitializeComponent();
+            SearchString = "";
+            DataContext = this;
         }
 
         protected override void OnDeactivated(EventArgs e)
@@ -41,7 +44,7 @@ namespace spotlight
         private void OnGroupClick(object sender, MouseButtonEventArgs e)
         {
             Group group = (Group) ((TextBlock) sender).DataContext;
-            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterRangeData(mainInputBox.Text, group.Type, 0));
+            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(mainInputBox.Text, group.Type, 0));
 
             // todo Add button Show All types (save group.Type)
             list.Add(new Group("Показать все результаты", EFileType.All));
@@ -50,7 +53,8 @@ namespace spotlight
 
         private void OnSearchInput(object sender, TextChangedEventArgs e)
         {
-            List<SearchItem> list = GroupToSearchItem(searchEngine.FilterRangeData(mainInputBox.Text, EFileType.All, 3));
+            SearchString = mainInputBox.Text;
+            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(mainInputBox.Text, EFileType.All, 3));
             listBox.ItemsSource = list;
         }
 
