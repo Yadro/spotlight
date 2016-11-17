@@ -63,7 +63,7 @@
                     <Setter Property="Border.BorderThickness" Value="0" />
                 </Style>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="13,0,13,0" />
+                    <Setter Property="Padding" Value="16,0" />
                     <Setter Property="Background" Value="White" />
                     <Setter Property="Border.BorderThickness" Value="0" />
                     <Style.Triggers>
@@ -100,7 +100,6 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Height="15" Width="15" Source="{Binding file.Icon}" Margin="0,-2,12,0" />
-                        <!-- см  <Setter Property="Padding" Value="12" /> -->
                         <local:HighlightTextBlock Grid.Column="1"
                                                   Text="{Binding file.DisplayName}" Width="Auto"
                                                   FontSize="15" TextWrapping="Wrap" />
