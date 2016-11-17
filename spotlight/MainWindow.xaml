@@ -54,15 +54,16 @@
 
                  Text="" />
 
-        <ListBox x:Name="listBox" Margin="0,40,0,0"
-                 ItemsSource="{Binding Path=MixedList}" >
+        <ListBox x:Name="listBox" Margin="0,40,0,0" ItemsSource="{Binding Path=MixedList}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 HorizontalContentAlignment="Stretch">
             <ListBox.Resources>
                 <Style TargetType="ListBox">
                     <Setter Property="Background" Value="White" />
                     <Setter Property="Border.BorderThickness" Value="0" />
                 </Style>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="12" />
+                    <Setter Property="Padding" Value="13,0,13,0" />
                     <Setter Property="Background" Value="White" />
                     <Setter Property="Border.BorderThickness" Value="0" />
                     <Style.Triggers>
@@ -79,7 +80,7 @@
                 <DataTemplate DataType="{x:Type listItem:SearchItemTile}">
                     <Grid MouseUp="UIElement_OnMouseUp">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Grid.RowSpan="2" Source="{Binding file.Icon}" Margin="0,0,12,0" />
@@ -93,22 +94,29 @@
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type listItem:SearchItemSmallTitle}">
-                    <Grid MouseUp="UIElement_OnMouseUp">
+                    <Grid Margin="0,7" MouseUp="UIElement_OnMouseUp">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
+                            <ColumnDefinition Width="30"/>
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Height="15" Width="15" Source="{Binding file.Icon}" Margin="0,-2,12,0" />
                         <!-- см  <Setter Property="Padding" Value="12" /> -->
                         <local:HighlightTextBlock Grid.Column="1"
-                                                  Text="{Binding file.DisplayName}"
-                                                  FontSize="15" Margin="0,-5,0,-5" TextWrapping="Wrap" />
+                                                  Text="{Binding file.DisplayName}" Width="Auto"
+                                                  FontSize="15" TextWrapping="Wrap" />
                     </Grid>
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type listItem:Group}">
-                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Margin="0,-5,0,-5"
-                               MouseUp="OnGroupClick" />
+                    <Grid Margin="0,7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="#383838" MouseUp="OnGroupClick" />
+                        <TextBlock Grid.Column="1" Text="&#xe23a;" FontFamily="Segoe UI Symbol" FontSize="13" />
+                    </Grid>
                 </DataTemplate>
             </ListBox.Resources>
         </ListBox>
