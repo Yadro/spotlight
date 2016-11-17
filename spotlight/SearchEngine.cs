@@ -53,7 +53,7 @@ namespace spotlight
         private void GenereateData()
         {
             List<string> fileList = new List<string>(FileList);
-            
+
             foreach (FileTypeName fileType in FileTypesList)
             {
                 List<string> other = new List<string>();
@@ -156,21 +156,25 @@ namespace spotlight
             }
         }
 
-        public List<GroupSearchItems> FilterRangeData(string filterQuery, EFileType typeQuery, int resultCount)
+        public List<GroupSearchItems> FilterRangeData(string filterQuery, EFileType? filterType, int resultCount)
         {
             string filter;
             EFileType type;
-            if (typeQuery != EFileType.All)
-            {
-                filter = GetSearchIgnoreFilter(filterQuery);
-                type = typeQuery;
-            }
-            else
+            if (filterType == null)
             {
                 SearchInputStruct searchInput = ParseSearchInput(filterQuery);
                 filter = searchInput.Search;
                 type = searchInput.Type;
                 resultCount = 10;
+            } else if (filterType == EFileType.App)
+            {
+                filter = GetSearchIgnoreFilter(filterQuery);
+                type = EFileType.App;
+            }
+            else
+            {
+                filter = GetSearchIgnoreFilter(filterQuery);
+                type = (EFileType) filterType;
             }
 
             var result = new List<GroupSearchItems>();
@@ -299,8 +303,7 @@ namespace spotlight
             {
                 EFileType? fileType = FileTypesList.GetTypeName(match.Groups[1].Value);
                 if (fileType != null)
-                    return new SearchInputStruct((EFileType)fileType, match.Groups[2].Value);
-                
+                    return new SearchInputStruct((EFileType) fileType, match.Groups[2].Value);
             }
             return new SearchInputStruct(EFileType.All, search);
         }
