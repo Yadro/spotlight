@@ -11,6 +11,7 @@ namespace spotlight
 {
     public partial class MainWindow : MetroWindow
     {
+        private bool ResultsFocus = false;
         private string SearchString { get; set; }
         private SearchEngine SearchEngine = new SearchEngine();
 
@@ -27,55 +28,17 @@ namespace spotlight
             //Hide();
         }
 
-        private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
+        private void SearchBox_Input(object sender, TextChangedEventArgs e)
         {
-            SearchItemTile dataContext = ((SearchItemTile) ((Grid) sender).DataContext);
-            FileInformation fileInformation = dataContext.file;
-            try
-            {
-                Process.Start(fileInformation.FileLocation);
-            }
-            catch (Win32Exception exception)
-            {
-                Console.WriteLine(exception.Message);
-            }
-        }
-
-        private void OnGroupClick(object sender, MouseButtonEventArgs e)
-        {
-            string filter = SearchEngine.GetSearchIgnoreFilter(mainInputBox.Text);
-            Group group = (Group) ((TextBlock) sender).DataContext;
-
-            EFileType type = group.Type;
-            if (type == EFileType.All)
-            {
-                // что вернет, если запрос ": SearchString"
-                mainInputBox.Text = SearchString = filter;
-            }
-            else
-            {
-                string typeName = SearchEngine.FileTypesList.GetTypeName(type);
-                mainInputBox.Text = SearchString = $"{typeName}: {filter}";
-            }
-            
-            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(filter, group.Type, 0));
-
-            // todo Add button Show All types (save group.Type)
-            list.Add(new Group("Показать все результаты", EFileType.All));
-            listBox.ItemsSource = list;
-        }
-
-        private void OnSearchInput(object sender, TextChangedEventArgs e)
-        {
-            SearchString = mainInputBox.Text;
-            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(mainInputBox.Text, EFileType.All, 3));
+            SearchString = SearchBox.Text;
+            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(SearchBox.Text, null, 3));
             listBox.ItemsSource = list;
         }
 
         private List<SearchItem> GroupToSearchItem(List<GroupSearchItems> items)
         {
             List<SearchItem> list = new List<SearchItem>();
-            items.ForEach(group =>
+            items.ForEach(group =>  
             {
                 if (group.Items.Count == 0)
                     return;
@@ -89,12 +52,79 @@ namespace spotlight
             return list;
         }
 
-        private void MainInputBox_OnKeyUp(object sender, KeyEventArgs e)
+        #region ResultItem
+        private void ResultItem_OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Down)
+            if (e.Key == Key.Enter || e.Key == Key.Space)
             {
-                listBox.Focus();
+                SearchItemTile dataContext = ((SearchItemTile)((Grid)sender).DataContext);
+                RunProgram(dataContext);
             }
         }
+        private void ResultItem_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            SearchItemTile dataContext = ((SearchItemTile)((Grid)sender).DataContext);
+            RunProgram(dataContext);
+        }
+
+        private void RunProgram(SearchItemTile dataContext)
+        {
+            FileInformation fileInformation = dataContext.file;
+            try
+            {
+                Process.Start(fileInformation.FileLocation);
+            }
+            catch (Win32Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+        }
+        #endregion
+
+        private void Group_OnClick(object sender, MouseButtonEventArgs e)
+        {
+            string filter = SearchEngine.GetSearchIgnoreFilter(SearchBox.Text);
+            Group group = (Group)((TextBlock)sender).DataContext;
+
+            EFileType type = group.Type;
+            if (type == EFileType.All)
+            {
+                // что вернет, если запрос ": SearchString"
+                SearchBox.Text = SearchString = filter;
+            }
+            else
+            {
+                string typeName = SearchEngine.FileTypesList.GetTypeName(type);
+                SearchBox.Text = SearchString = $"{typeName}: {filter}";
+            }
+
+            List<SearchItem> list = GroupToSearchItem(SearchEngine.FilterRangeData(filter, group.Type, 0));
+
+            // todo Add button Show All types (save group.Type)
+            list.Add(new Group("Показать все результаты", EFileType.All));
+            listBox.ItemsSource = list;
+        }
+
+        private void SearchBox_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Down)
+                listBox.Focus();
+        }
+
+        private void Window_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            bool isText = (e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) ||
+                          (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                          || e.Key == Key.OemQuestion || e.Key == Key.OemQuotes || e.Key == Key.OemPlus
+                          || e.Key == Key.OemOpenBrackets || e.Key == Key.OemCloseBrackets || e.Key == Key.OemMinus
+                          || e.Key == Key.DeadCharProcessed || e.Key == Key.Oem1 || e.Key == Key.Oem7
+                          || e.Key == Key.OemPeriod || e.Key == Key.OemComma || e.Key == Key.OemMinus
+                          || e.Key == Key.Add || e.Key == Key.Divide || e.Key == Key.Multiply || e.Key == Key.Subtract
+                          || e.Key == Key.Oem102 || e.Key == Key.Decimal;
+            if (isText)
+                SearchBox.Focus();
+        }
+
+        
     }
 }

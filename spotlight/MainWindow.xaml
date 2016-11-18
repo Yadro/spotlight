@@ -13,7 +13,10 @@
                       BorderThickness="0"
                       GlowBrush="Black"
                       WindowButtonCommandsOverlayBehavior="Always"
-                      WindowStartupLocation="CenterScreen">
+                      WindowStartupLocation="CenterScreen"
+                      
+                      KeyDown="Window_OnKeyUp"
+                      >
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -32,7 +35,7 @@
                 Background="#f3f3f3"
                 Height="40" />
 
-        <TextBox x:Name="mainInputBox"
+        <TextBox x:Name="SearchBox"
                  Controls:TextBoxHelper.Watermark="Поиск в Windows"
                  Controls:TextBoxHelper.ClearTextButton="False"
 
@@ -49,9 +52,8 @@
                  FontSize="18"
                  TextWrapping="Wrap"
 
-                 TextChanged="OnSearchInput"
-                 KeyUp="MainInputBox_OnKeyUp"
-
+                 TextChanged="SearchBox_Input"
+                 KeyUp="SearchBox_OnKeyUp"
                  Text="" />
 
         <ListBox x:Name="listBox" Margin="0,40,0,0" ItemsSource="{Binding Path=MixedList}"
@@ -78,7 +80,7 @@
                 </Style>
 
                 <DataTemplate DataType="{x:Type listItem:SearchItemTile}">
-                    <Grid MouseUp="UIElement_OnMouseUp">
+                    <Grid MouseUp="ResultItem_OnMouseUp">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -94,14 +96,15 @@
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type listItem:SearchItemSmallTitle}">
-                    <Grid Margin="0,7" MouseUp="UIElement_OnMouseUp">
+                    <Grid Margin="0,7" MouseUp="ResultItem_OnMouseUp" KeyUp="ResultItem_OnKeyUp">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="32"/>
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <Image Grid.Column="0" Height="15" Width="15" Source="{Binding file.Icon}" Margin="0,-2,12,0" />
+                        <Image Grid.Column="0" Height="16" Width="16" Source="{Binding file.Icon}" Margin="0,0,12,0" />
                         <local:HighlightTextBlock Grid.Column="1"
                                                   Text="{Binding file.DisplayName}" Width="Auto"
+                                                  HighlightText="{Binding ElementName=SearchBox, Path=Text}"
                                                   FontSize="15" TextWrapping="Wrap" />
                     </Grid>
                 </DataTemplate>
@@ -113,7 +116,7 @@
                             <ColumnDefinition Width="10" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="#383838" MouseUp="OnGroupClick" />
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="#383838" MouseUp="Group_OnClick" />
                         <TextBlock Grid.Column="1" Text="&#xe23a;" FontFamily="Segoe UI Symbol" FontSize="13" />
                     </Grid>
                 </DataTemplate>
