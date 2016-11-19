@@ -28,6 +28,12 @@ namespace spotlight
             //Hide();
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            SearchEngine.SearchRangeManager.DoSerializeData();
+            base.OnClosed(e);
+        }
+
         private void SearchBox_Input(object sender, TextChangedEventArgs e)
         {
             SearchString = SearchBox.Text;
@@ -58,18 +64,19 @@ namespace spotlight
             if (e.Key == Key.Enter || e.Key == Key.Space)
             {
                 SearchItemTile dataContext = ((SearchItemTile)((Grid)sender).DataContext);
-                RunProgram(dataContext);
+                ResultItemClick(dataContext);
             }
         }
         private void ResultItem_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
             SearchItemTile dataContext = ((SearchItemTile)((Grid)sender).DataContext);
-            RunProgram(dataContext);
+            ResultItemClick(dataContext);
         }
 
-        private void RunProgram(SearchItemTile dataContext)
+        private void ResultItemClick(SearchItemTile dataContext)
         {
             FileInformation fileInformation = dataContext.file;
+            SearchEngine.AddQuery(SearchString, fileInformation);
             try
             {
                 Process.Start(fileInformation.FileLocation);

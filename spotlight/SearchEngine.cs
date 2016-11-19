@@ -31,6 +31,7 @@ namespace spotlight
         public List<SearchItemStruct> SearchItems = new List<SearchItemStruct>();
         public List<GroupSearchItems> Groups = new List<GroupSearchItems>();
         public static FileTypesList FileTypesList = new FileTypesList();
+        public SearchRangeManager SearchRangeManager = new SearchRangeManager();
 
         public SearchEngine()
         {
@@ -324,6 +325,11 @@ namespace spotlight
             Regex spaces = new Regex(@"\w+(\W)");
             MatchCollection matchCollection = spaces.Matches(source.Substring(0, beginMatch));
             return matchCollection.Count + 1;
+        }
+
+        public void AddQuery(string query, FileInformation file)
+        {
+            SearchRangeManager.AddQuery(GetSearchIgnoreFilter(query), file.FileLocation);
         }
     }
 }
